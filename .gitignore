@@ -1,0 +1,13 @@
+# Dependencias
+node_modules/
+npm-debug.log*
+
+# Base de datos y configuración local (contiene información privada)
+data/
+
+# Sesión de WhatsApp Web (¡CONTIENE TUS CREDENCIALES DE ACCESO!)
+.wwebjs_auth/
+
+# Logs y archivos temporales
+*.log
+.DS_Store

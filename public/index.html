@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notificador de Cuentas - WhatsApp</title>
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Sidebar / Navigation -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i data-lucide="bell-ring"></i>
+        </div>
+        <h2>NotiPay</h2>
+      </div>
+      
+      <nav class="nav-menu">
+        <a href="#" class="nav-item active" data-tab="dashboard">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="bills">
+          <i data-lucide="receipt"></i>
+          <span>Gestionar Cuentas</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="settings">
+          <i data-lucide="settings"></i>
+          <span>Configuración</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="whatsapp">
+          <i data-lucide="message-square"></i>
+          <span>WhatsApp Connection</span>
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <p>NotiPay v1.0.0</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="welcome-text">
+          <h1 id="page-title">Panel de Control</h1>
+          <p class="text-muted" id="page-subtitle">Monitorea tus pagos pendientes y alertas de WhatsApp.</p>
+        </div>
+        
+        <div class="topbar-actions">
+          <button class="btn btn-primary btn-add-bill" id="btn-open-add-modal">
+            <i data-lucide="plus"></i>
+            <span>Nueva Cuenta</span>
+          </button>
+          
+          <div class="whatsapp-badge disconnected" id="whatsapp-quick-status">
+            <div class="badge-dot"></div>
+            <span class="badge-text">WhatsApp: Desconectado</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Tab -->
+      <section class="tab-content active" id="tab-dashboard">
+        <!-- Stats Cards Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon pending">
+              <i data-lucide="clock"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total Pendiente</span>
+              <h3 class="stat-value" id="stat-pending-amount">S/. 0.00</h3>
+              <p class="stat-desc" id="stat-pending-count">0 cuentas pendientes</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon overdue">
+              <i data-lucide="alert-triangle"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Cuentas Vencidas</span>
+              <h3 class="stat-value" id="stat-overdue-amount">S/. 0.00</h3>
+              <p class="stat-desc" id="stat-overdue-count">0 cuentas vencidas</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon paid">
+              <i data-lucide="check-circle2"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total Pagado</span>
+              <h3 class="stat-value" id="stat-paid-amount">S/. 0.00</h3>
+              <p class="stat-desc" id="stat-paid-count">0 cuentas pagadas</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Dashboard Split -->
+        <div class="dashboard-split">
+          
+          <!-- Next Bills list -->
+          <div class="split-card bills-preview">
+            <div class="card-header">
+              <h3>Próximos Vencimientos</h3>
+              <a href="#" class="view-all-link" id="link-view-all-bills">Ver todas <i data-lucide="arrow-right"></i></a>
+            </div>
+            <div class="card-body">
+              <div class="list-container" id="upcoming-bills-list">
+                <div class="loading-state">
+                  <div class="spinner"></div>
+                  <p>Cargando vencimientos...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connection Panel inside Dashboard -->
+          <div class="split-card whatsapp-preview">
+            <div class="card-header">
+              <h3>Estado de WhatsApp</h3>
+            </div>
+            <div class="card-body">
+              <div class="whatsapp-card-content" id="whatsapp-dashboard-panel">
+                <!-- Will be dynamically populated with disconnected/qr/connected UI -->
+                <div class="loading-state">
+                  <div class="spinner"></div>
+                  <p>Verificando conexión...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Manage Bills Tab -->
+      <section class="tab-content" id="tab-bills">
+        <div class="data-card">
+          <div class="filter-bar">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="bill-search" placeholder="Buscar por servicio o cuenta...">
+            </div>
+            <div class="filter-options">
+              <button class="filter-btn active" data-filter="all">Todas</button>
+              <button class="filter-btn" data-filter="pending">Pendientes</button>
+              <button class="filter-btn" data-filter="overdue">Vencidas</button>
+              <button class="filter-btn" data-filter="paid">Pagadas</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="bills-table">
+              <thead>
+                <tr>
+                  <th>Nombre/Servicio</th>
+                  <th>Monto</th>
+                  <th>Fecha Vencimiento</th>
+                  <th>Días Restantes</th>
+                  <th>Notificar a</th>
+                  <th>Notificado</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="bills-table-body">
+                <!-- Dynamically filled -->
+                <tr>
+                  <td colspan="8" class="text-center text-muted py-4">No hay cuentas registradas.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Tab -->
+      <section class="tab-content" id="tab-settings">
+        <div class="settings-grid">
+          
+          <div class="settings-card">
+            <h3><i data-lucide="bell"></i> Configuración de Alertas</h3>
+            <form id="settings-form">
+              <div class="form-group-row">
+                <div class="form-group">
+                  <label for="settings-currency">Símbolo Monetario</label>
+                  <input type="text" id="settings-currency" placeholder="Ej. S/. o $">
+                </div>
+                <div class="form-group">
+                  <label for="settings-time">Hora de Envío</label>
+                  <input type="time" id="settings-time" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="settings-default-phone">Teléfono de WhatsApp por Defecto (con código de país)</label>
+                <input type="text" id="settings-default-phone" placeholder="Ej. 51999999999 (Perú)">
+                <small class="text-muted">Se usará este número si no configuras un teléfono específico para una cuenta.</small>
+              </div>
+
+              <div class="checkbox-group">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="settings-notify-due">
+                  <span class="checkmark"></span>
+                  Enviar recordatorio el día del vencimiento
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label for="settings-days-before">Enviar recordatorio anticipado (días antes)</label>
+                <input type="number" id="settings-days-before" min="0" max="30">
+                <small class="text-muted">Coloca 0 para desactivar la alerta anticipada.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="settings-template">Plantilla del Mensaje de WhatsApp</label>
+                <textarea id="settings-template" rows="5" placeholder="Plantilla de recordatorio..."></textarea>
+                <div class="template-variables">
+                  <span class="var-badge" data-var="{name}">{name} (Nombre)</span>
+                  <span class="var-badge" data-var="{amount}">{amount} (Monto)</span>
+                  <span class="var-badge" data-var="{currency}">{currency} (Moneda)</span>
+                  <span class="var-badge" data-var="{dueDate}">{dueDate} (Vencimiento)</span>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="btn-save-settings">
+                  <i data-lucide="save"></i> Guardar Configuración
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="settings-card">
+            <h3><i data-lucide="message-square"></i> Probar Notificación</h3>
+            <p class="text-muted mb-4">Envía un mensaje de prueba rápido para comprobar el correcto funcionamiento de WhatsApp.</p>
+            
+            <form id="test-message-form">
+              <div class="form-group">
+                <label for="test-phone">Teléfono Destinatario (con código de país)</label>
+                <input type="text" id="test-phone" placeholder="Ej. 51999999999" required>
+              </div>
+              <div class="form-group">
+                <label for="test-message">Mensaje</label>
+                <textarea id="test-message" rows="3" required>¡Hola! Esta es una prueba del Notificador de Cuentas. Tu conexión funciona correctamente. 🚀</textarea>
+              </div>
+              <button type="submit" class="btn btn-secondary" id="btn-send-test">
+                <i data-lucide="send"></i> Enviar Mensaje de Prueba
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- WhatsApp Dedicated Tab -->
+      <section class="tab-content" id="tab-whatsapp">
+        <div class="whatsapp-management-card">
+          <div class="card-header-main">
+            <div class="whatsapp-logo-title">
+              <i data-lucide="message-square" class="wa-icon-large"></i>
+              <div>
+                <h3>Gestión de WhatsApp Web</h3>
+                <p class="text-muted">Conecta o desconecta tu cuenta para enviar mensajes automáticos.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="whatsapp-full-content" id="whatsapp-full-panel">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Add/Edit Bill Modal -->
+  <div class="modal-backdrop" id="bill-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Agregar Nueva Cuenta</h3>
+        <button class="btn-close" id="btn-close-modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      
+      <form id="bill-form">
+        <input type="hidden" id="bill-id">
+        
+        <div class="form-group">
+          <label for="bill-name">Nombre de la Cuenta / Servicio</label>
+          <input type="text" id="bill-name" placeholder="Ej. Luz, Internet Fibra, Alquiler" required>
+        </div>
+        
+        <div class="form-group-row">
+          <div class="form-group">
+            <label for="bill-amount">Monto</label>
+            <input type="number" id="bill-amount" step="0.01" min="0" placeholder="0.00" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="bill-due-date">Fecha de Vencimiento</label>
+            <input type="date" id="bill-due-date" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bill-phone">Número de WhatsApp Destinatario (Opcional)</label>
+          <input type="text" id="bill-phone" placeholder="Ej. 51999999999 (Dejar en blanco para usar el por defecto)">
+          <small class="text-muted">Incluye el código de país sin el signo '+'. Si lo dejas vacío, se enviará al número por defecto configurado.</small>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-bill">Guardar Cuenta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
