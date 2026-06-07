@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Presupuesto Personal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 900px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 1rem;
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .stat-card.income {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .stat-card.expense {
+      background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    }
+
+    .stat-card.available {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section h2 {
+      font-size: 1.3rem;
+      color: #333;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section h2 i {
+      width: 24px;
+      height: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-family: 'Outfit', sans-serif;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    button.secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background: #f5f5f5;
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .badge.income {
+      background: rgba(17, 153, 142, 0.1);
+      color: #11998e;
+    }
+
+    .badge.expense {
+      background: rgba(238, 9, 121, 0.1);
+      color: #ee0979;
+    }
+
+    .amount {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .amount.income {
+      color: #11998e;
+    }
+
+    .amount.expense {
+      color: #ee0979;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 15px 20px;
+      border-radius: 0.5rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.success {
+      border-left: 4px solid #11998e;
+    }
+
+    .toast.error {
+      border-left: 4px solid #ee0979;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+
+    .empty-state i {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 20px;
+      opacity: 0.3;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .category-card {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 0.5rem;
+      text-align: center;
+    }
+
+    .category-card h4 {
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .category-card .amount {
+      font-size: 1.3rem;
+    }
+
+    .progress-bar {
+      background: #e0e0e0;
+      height: 4px;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 0.9rem;
+      }
+
+      td, th {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>💰 Gestor de Presupuesto</h1>
+      <p>Controla tus ingresos y gastos del mes</p>
+    </header>
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+      <div class="stat-card income">
+        <h3>Ingresos</h3>
+        <div class="value" id="totalIncome">S/. 0.00</div>
+      </div>
+      <div class="stat-card expense">
+        <h3>Gastos</h3>
+        <div class="value" id="totalExpense">S/. 0.00</div>
+      </div>
+      <div class="stat-card available">
+        <h3>Disponible</h3>
+        <div class="value" id="available">S/. 0.00</div>
+      </div>
+    </div>
+
+    <!-- Formulario para agregar transacciones -->
+    <div class="section">
+      <h2><i data-lucide="plus-circle"></i> Nueva Transacción</h2>
+      <form id="transactionForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="type" required>
+              <option value="income">Ingreso</option>
+              <option value="expense">Gasto</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" id="date" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <input type="text" id="description" placeholder="Ej. Salario, Comida, Servicios" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Categoría</label>
+            <select id="category" required>
+              <option value="General">General</option>
+              <option value="Salario">Salario</option>
+              <option value="Comida">Comida</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Servicios">Servicios</option>
+              <option value="Entretenimiento">Entretenimiento</option>
+              <option value="Salud">Salud</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Monto (S/.)</label>
+            <input type="number" id="amount" step="0.01" min="0" placeholder="0.00" required>
+          </div>
+        </div>
+
+        <button type="submit"><i data-lucide="save"></i> Agregar Transacción</button>
+      </form>
+    </div>
+
+    <!-- Gastos por categoría -->
+    <div class="section">
+      <h2><i data-lucide="bar-chart-2"></i> Gasto por Categoría</h2>
+      <div class="categories-grid" id="categoriesGrid">
+        <div class="empty-state">Sin gastos registrados</div>
+      </div>
+    </div>
+
+    <!-- Transacciones -->
+    <div class="section">
+      <h2><i data-lucide="list"></i> Últimas Transacciones</h2>
+      <div style="overflow-x: auto;">
+        <table id="transactionsTable">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              <th>Categoría</th>
+              <th>Tipo</th>
+              <th>Monto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="6" class="empty-state">No hay transacciones registradas</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+    // Establecer fecha de hoy por defecto
+    document.getElementById('date').valueAsDate = new Date();
+
+    // Inicializar
+    renderAll();
+
+    // Form submit
+    document.getElementById('transactionForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const transaction = {
+        id: Date.now(),
+        type: document.getElementById('type').value,
+        date: document.getElementById('date').value,
+        description: document.getElementById('description').value,
+        category: document.getElementById('category').value,
+        amount: parseFloat(document.getElementById('amount').value)
+      };
+
+      transactions.push(transaction);
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+
+      showToast('Transacción agregada ✅', 'success');
+      document.getElementById('transactionForm').reset();
+      document.getElementById('date').valueAsDate = new Date();
+      renderAll();
+    });
+
+    function renderAll() {
+      renderStats();
+      renderCategories();
+      renderTable();
+    }
+
+    function renderStats() {
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const monthTransactions = transactions.filter(t => t.date.startsWith(currentMonth));
+
+      const totalIncome = monthTransactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      const totalExpense = monthTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      const available = totalIncome - totalExpense;
+
+      document.getElementById('totalIncome').textContent = `S/. ${totalIncome.toFixed(2)}`;
+      document.getElementById('totalExpense').textContent = `S/. ${totalExpense.toFixed(2)}`;
+      document.getElementById('available').textContent = `S/. ${available.toFixed(2)}`;
+
+      // Cambiar color si es negativo
+      const availableCard = document.getElementById('available').parentElement;
+      if (available < 0) {
+        availableCard.style.background = 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)';
+      } else {
+        availableCard.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+      }
+    }
+
+    function renderCategories() {
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const monthTransactions = transactions.filter(t => t.date.startsWith(currentMonth) && t.type === 'expense');
+
+      const categories = {};
+      monthTransactions.forEach(t => {
+        categories[t.category] = (categories[t.category] || 0) + t.amount;
+      });
+
+      const grid = document.getElementById('categoriesGrid');
+      if (Object.keys(categories).length === 0) {
+        grid.innerHTML = '<div class="empty-state">Sin gastos registrados</div>';
+        return;
+      }
+
+      const maxAmount = Math.max(...Object.values(categories));
+      grid.innerHTML = Object.entries(categories)
+        .sort((a, b) => b[1] - a[1])
+        .map(([cat, amount]) => `
+          <div class="category-card">
+            <h4>${cat}</h4>
+            <div class="amount expense">S/. ${amount.toFixed(2)}</div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${(amount / maxAmount) * 100}%"></div>
+            </div>
+          </div>
+        `).join('');
+
+      lucide.createIcons();
+    }
+
+    function renderTable() {
+      const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+      const tbody = document.getElementById('tableBody');
+
+      if (sorted.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay transacciones registradas</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = sorted.map(t => `
+        <tr>
+          <td>${new Date(t.date).toLocaleDateString('es-PE')}</td>
+          <td>${t.description}</td>
+          <td>${t.category}</td>
+          <td><span class="badge ${t.type}">${t.type === 'income' ? 'Ingreso' : 'Gasto'}</span></td>
+          <td><span class="amount ${t.type}">${t.type === 'income' ? '+' : '-'}S/. ${t.amount.toFixed(2)}</span></td>
+          <td>
+            <button class="secondary" style="padding: 6px 12px; font-size: 0.9rem;" onclick="deleteTransaction(${t.id})">
+              <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i> Eliminar
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function deleteTransaction(id) {
+      if (confirm('¿Eliminar esta transacción?')) {
+        transactions = transactions.filter(t => t.id !== id);
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+        showToast('Transacción eliminada', 'success');
+        renderAll();
+      }
+    }
+
+    function showToast(message, type) {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = message;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Inicializar iconos
+    lucide.createIcons();
+  </script>
+</body>
+</html>
